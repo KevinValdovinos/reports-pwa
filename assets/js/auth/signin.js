@@ -8,6 +8,7 @@
 
 const form = document.getElementById('signinForm');
 const submitSigninForm = async (event) => {
+  console.log("Entro aqui");
   event.stopPropagation();
   event.preventDefault();
   if (form.checkValidity()) {
@@ -18,6 +19,7 @@ const submitSigninForm = async (event) => {
         username,
         password,
       });
+      console.log(response);
       const payload = JSON.parse(atob(response.token.split('.')[1]));
       console.log(payload);
       if (response?.token) {
@@ -31,7 +33,7 @@ const submitSigninForm = async (event) => {
         changeView(payload.roles[0].role);
       }
     } catch (error) {
-      console.log(error.response.data);
+      console.log(error);
       toastMessage('Credenciales incorrectas').showToast();
     }
   }

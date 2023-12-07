@@ -66,6 +66,12 @@
           <!-- End Notification Nav -->
           <!-- End Messages Nav -->
 
+          <li class="nav-item">
+            <a href="#" class="nav-link nav-icon" id="notifications">
+              <i class="bi bi-bell" id="notifyActivated"></i>
+              <i class="bi bi-bell-slash" id="notifyDeactivated"></i>
+            </a>
+          </li>
           <li class="nav-item dropdown pe-3">
             <a
               class="nav-link nav-profile d-flex align-items-center pe-0"
@@ -200,14 +206,7 @@
                     <th scope="col">Fecha</th>
                     <th scope="col">Acciones</th>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>Brandon Jacob</td>
-                      <td>Designer</td>
-                      <td>28</td>
-                      <td>2016-05-25</td>
-                    </tr>
+                  <tbody id="pendingIncidences">
                   </tbody>
                 </table>
               </div>
@@ -243,7 +242,7 @@
             Soluta at et reprehenderit. Placeat autem numquam et fuga numquam.
             Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet
             incidunt est facilis. Dolorem neque recusandae quo sit molestias
-            sint dignissimos.
+            sint dignissimos.esrtyklkj
           </div>
           <div class="modal-footer">
             <button
@@ -293,6 +292,7 @@
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/axios/axios-intance.js"></script>
     <script src="/assets/js/toast/toasts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@8.0.1/dist/pouchdb.min.js"></script>
     <script src="/assets/js/admin/admin.home.controller.js"></script>
   </body>
 </html>

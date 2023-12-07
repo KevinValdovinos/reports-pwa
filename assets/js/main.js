@@ -6,19 +6,78 @@
  * License: https://bootstrapmade.com/license/
  */
 
+let swReg;
 if (navigator.serviceWorker) {
-  navigator.serviceWorker.register('/sw.js')
+  navigator.serviceWorker.register('/sw.js').then(swRegRes=>{
+    swReg = swRegRes;
+    swReg.pushManager.getSubscription().then(verifyNotifications)
+  })
+}
+
+const verifyNotifications = (activated)=>{
+  console.log(activated);
+  if (activated) {
+    console.log("true");
+    $('#notifyActivated').css('display', 'block')
+    $('#notifyDeactivated').css('display', 'none')
+  }else{
+    console.log("false");
+    $('#notifyDeactivated').css('display', 'block')
+    $('#notifyActivated').css('display', 'none')
+
+  }
 
 }
-const isOnline = () => {
-  if (navigator.onLine) {
-    toastMessage('Tienes conexión a Internet').showToast();
-  } else {
-    toastMessage('Estas en  modo offline').showToast();
-  }
+
+
+const parseJWT = () =>{
+  const token = localStorage.getItem('token');;
+  const payload = token.split('.')[1]
+  const base64 = payload.replace(/-/g,'+').replace(/_/g, '/');
+  const user = decodeURIComponent(window.atob(base64).split('').map(
+    c=>{
+      return `%${('00'+c.charCodeAt(0).toString(16)).slice(-2)}`
+    }
+  ).join(''))
+  return JSON.parse(user)
 }
-window.addEventListener('online',isOnline);
-window.addEventListener('offline',isOnline);
+
+$(document).on('click', "#notifications", async ()=>{
+  console.log("Entro en el onclick");
+    try{
+      const subscription = await swReg.pushManager.getSubscription();
+      if(subscription){
+        subscription.unsubscribe().then(() => verifyNotifications(false));
+        return 
+      }
+      if(!swReg) return;
+      const response = await axiosClient.get('/notification/',{
+        responseType: 'arraybuffer'
+      })
+      const data = new Uint8Array(response)
+      swReg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: data
+      }).then((res) => res.toJson())
+      .then((subscription) =>{
+        console.log(subscription);
+        const user = parseJWT();
+        axiosClient.post('/notification/',{
+          id: user.id,
+          userDetails: {subscription}
+        }).then((res) => verifyNotifications(res['updated']))
+        .catch((res) =>{
+          swReg.pushManager.getSubscription().then((subscription) =>{
+            subscription.unsubscribe.then(()=>verifyNotifications(false));
+          })
+        })
+      })
+    }catch(error){
+
+    }
+})
+
+
 
 var fullname = ``;
 var role = ``;
@@ -32,7 +91,7 @@ const changeView = (role) => {
     case 'ENCARGADO':
       window.location.href = '/pages/attendant/home.html';
       break;
-    case 'DOCENTE':
+    case 'EMPLEADO':
       window.location.href = '/pages/docent/home.html';
       break;
     default:
